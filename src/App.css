@@ -1,0 +1,65 @@
+@import 'bootstrap/dist/css/bootstrap.min.css';
+
+.app{
+  height: 150vh;
+  background-color: #f9fafb;
+}
+.d-grid{
+  display: grid;
+  grid-template-columns: repeat(2,1fr);
+  grid-gap: 20px;
+  grid-template-areas: 
+  "control preview"
+  "control code"
+  "control template";
+  
+}
+.d-grid>.control,.css-code,.template{
+  padding: 15px;
+}
+.preview-header{
+  background-color: #fff;
+  padding: 15px;
+}
+.control,.css-code,.template{
+  background-color: #fff;
+}
+input[type="range"]{
+  max-width: 500px;
+  width: 100%;
+} 
+.code-css{
+  grid-area: code;
+}
+.preview{
+  grid-area: preview;
+}
+.template {
+  grid-area: template;
+}
+.control{
+  grid-area: control;
+}
+.box-preview{
+  width: 150px;
+  height: 150px;
+}
+.box-color {
+  border: 1px solid #ccc;
+  border-radius: 5px;
+  cursor: pointer;
+  padding : 3px
+}
+.layer-slice{
+  background-color:mediumturquoise;
+  padding: 8px;
+}
+button{
+  border: none;
+  background-color: transparent
+}
+.layer {
+  padding: 8px;
+  cursor: all-scroll;
+}
+
