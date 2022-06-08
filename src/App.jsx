@@ -1,28 +1,85 @@
 import './App.css'
-import { useState } from 'react'
-import { SketchPicker } from 'react-color'
+import { useEffect, useState, useRef } from 'react'
 import ColorPicker from './component/ColorPicker'
 import  {AiFillCloseCircle,AiFillEdit} from "react-icons/ai"
+import InputRange from './component/InputRange'
 function App() {
-  
-  const [inset,setInset] = useState(false)
 
-  const [state,setState] = useState({
+  const [layerCurrent,setLayerCurrent] = useState({
+    "id":1,
     "right": 0,
     "down" : 0,
     "spread" :3,
     "blur" : 5,
     "opacity" :20,
+    "color":{
+      'r':0,
+      'g':0,
+      'b':0,
+      'a':0.2 
+    },
+    "inset" :false
   })
-
-  const [shadow,setShawdow] = useState({
-    r:0,
-    g:0,
-    b:0,
-    a:0.2
-  })
+  const [layer,setLayer] = useState([{
+    "id":1,
+    "right": 0,
+    "down" : 0,
+    "spread" :3,
+    "blur" : 5,
+    "opacity" :20,
+    "color":{
+      'r':0,
+      'g':0,
+      'b':0,
+      'a':0.2 
+    },
+    "inset" : false
+  }])
   
-  const [layer,setLayer] = useState([{...state,...shadow}])
+  const handleInput = (value, name) => {
+    const v = {}
+    v[name] = value
+    console.log(v);
+    setLayerCurrent({...layerCurrent, ...v})
+    setLayer(layer.map(item => item.id === layerCurrent.id ? {...item, ...v}: item))
+}
+
+  const handleOpacity = (value) => {
+    setLayerCurrent({...layerCurrent, color:{...color,  a: value/100} })
+    setLayer(layer.map(item => item.id === layerCurrent.id ? {...item, color:{...color, a: value/100}}: item))
+  }
+
+  const handleAddLayer = () => {
+    const lastItem = layer[layer.length - 1]
+    const index = lastItem.id + 1
+    console.log(index);
+    setLayer(
+      [...layer,
+        {...layerCurrent,
+          "id" :index
+        }
+      ]
+    )
+  }
+
+  const handleRemove = (index) => {
+    const layer1 = [...layer]
+    layer1.splice(index,1)
+    setLayer(layer1)
+  }
+  const handleEdit = (id) => {
+    const item = layer.find(item => item.id == id)
+    setLayerCurrent(item)
+    console.log(layerCurrent);
+  }
+  const handeInset = (e) => {
+    setLayerCurrent({
+      ...layerCurrent,
+      "inset" : e.target.checked
+    })
+    setLayer(layer.map(item => item.id === layerCurrent.id ? {...item, "inset" : e.target.checked}: item))
+  }
+
 
   const [color,setColor] = useState({
     r:61,
@@ -30,7 +87,6 @@ function App() {
     b:246,
     a:1
   })
-
   const [backgroundColor,setBackgroundColor] = useState(
     {
       r:255,
@@ -39,132 +95,102 @@ function App() {
       a:1
     }
   )
-
-  const handleSetShawdow = (e) => {
-    setShawdow(e.rgb)
-  }
-  console.log();
   const handleBackgroundColor = (e) => {
     setBackgroundColor (e.rgb)
   }
-
-
   const handleColor = (e) => {
     setColor(e.rgb)
   }
-  const handleChange = (e) => {
-    setState({
-      ...state,
-      [e.target.name] : e.target.value
-    })
-  }
-  const handleOpacity = (e) => {
-    setShawdow({
-      ...shadow,
-      a:e.target.value/100
-    })
-  }
 
-  const handleAddLayer = () => {
-    setLayer(
-      [...layer,
-        {...state,...shadow}
-      ]
+  const handleSetShawdow = (e) => {
+    setLayerCurrent({
+      ...layerCurrent,
+      "color":{
+        ...e.rgb
+      }
+    })
+    setLayer(layer.map(item => item.id === layerCurrent.id ? layerCurrent : item))
+  }
+  const getBoxShadow = () =>
+    layer.map(item=>
+      `${item.right}px ${item.down}px ${item.blur}px ${item.spread}px rgba(${item.color.r},${item.color.g},${item.color. b },${item.color.a})${item.inset ? "inset" : ""}`
     )
-  }
-  const handleRemove = (index) => {
-    const layer1 = [...layer]
-    layer1.splice(index,1)
-    setLayer(layer1)
-  }
-  const handeInset = () => {
-    setInset(!inset)
-  }
-
+  
+  console.log(getBoxShadow());
   return (
     <div className="app d-flex align-items-center">
       <div className="container">
         <div className="d-grid">
           <div className="control">
             <h1>Box-Shadow CSS Generator</h1>
-            <div className='mt-3'>
-              <label className='d-block' htmlFor="sfr">Shift right</label>
-              <input type="range" name='right' 
-              min={-50} max={50} 
-              defaultValue={state.right} 
-              onChange={(e) => handleChange(e)} 
-              id='sfr' />
-            </div>
-            <div className='mt-3'>
-              <label className='d-block' htmlFor="sfd">Shift down</label>
-              <input type="range" name='down' 
-              min={-50} max={50} 
-              defaultValue={state.down} 
-              onChange={(e) => handleChange(e)} 
-              id='sfd'  />
-            </div>
-            <div className='mt-3'>
-              <label className='d-block' htmlFor="spread">Spread</label>
-              <input type="range" name='spread' 
-              defaultValue={state.spread} 
-              onChange={(e) => handleChange(e)} 
-              id='spread'  />
-            </div>
-            <div className='mt-3'>
-              <label className='d-block' htmlFor="blur">Blur</label>
-              <input type="range" name='blur' 
-              defaultValue={state.blur} 
-              onChange={(e) => handleChange(e)} 
-              id='blur'  />
-            </div>
-            <div className='mt-3'>
-              <label className='d-block' htmlFor="opacity">Opacity</label>
-              <input type="range"
-              name='opacity' 
-              defaultValue={state.opacity} 
-              onChange={(e) => handleOpacity(e)} id='opacity'  />
-            </div>
+            <InputRange
+              min = {-50}
+              max={50} 
+              handleInput={(value,e) => handleInput(value,"right")} 
+              label={"Shift right"}
+              initial = {layerCurrent.right}
+            />
+            <InputRange
+              min = {-50}
+              max={50} 
+              handleInput={(value) => handleInput(value,'down')} 
+              label={"Shift down"}
+              initial = {layerCurrent.down}
+            />
+            <InputRange
+              min = {0}
+              max={100} 
+              handleInput={(value) => handleInput(value,"spread")} 
+              label={"Spread"}
+              initial = {layerCurrent.spread}
+            />
+            <InputRange
+              min = {0}
+              max={100} 
+              handleInput={(value) => handleInput(value,"blur")} 
+              label={"Blur"}
+              initial = {layerCurrent.blur}
+            />
+            <InputRange
+              min = {0}
+              max={100} 
+              handleInput={(value) => handleOpacity(value)} 
+              label={"Opacity"}
+              initial = {layerCurrent.opacity}
+            />
+
             <div className="mt-3">
-              <input type="checkBox" id='inset' onChange={handeInset}/>
+              <input type="checkBox" id='inset' onChange={(e) => handeInset(e)}/>
               <label htmlFor="inset">Inset</label>
             </div>
             <div className="mt-3">
               <ColorPicker 
-                color={shadow}
+                color={layerCurrent.color}
                 handleColorPicker={handleSetShawdow}
               />
             </div>
             <div className='mt-3'>
               <button className='btn btn-light mb-3' onClick={handleAddLayer}>Add Layer</button>
-              <div> 
-              <div className='layer d-flex justify-content-between align-middle'>
-                          <span>
-                            {`${inset ? "inset" : ""} ${state.right}px ${state.down}px ${state.blur}px ${state.spread}px rgba(${shadow.r}, ${shadow.g}, ${ shadow.b }, ${shadow.a }) `}
-                          </span>
-                          <div>
-                            <button className='me-3' disabled><AiFillEdit/></button>
-                            <button disabled onClick={() => handleRemove(index)}><AiFillCloseCircle/></button>
-                          </div>
-                        </div>
-                {/* {
-                  layer.length >0 ? layer.map((item,index)=>{
+              <ul> 
+                {
+                  layer.map((item,index) => {
                     return(
-                      <>
-                        <div className='layer d-flex justify-content-between align-middle' key={index}>
-                          <span>
-                            {`${item.right}px ${item.down}px ${item.blur}px ${item.spread}px rgba(${item.r}, ${item.g}, ${ item.b }, ${item.a }) `}
-                          </span>
+                      <li key={item.id} className={`${item.id==layerCurrent.id ? 'layer-slice' : 'layer'} d-flex justify-content-between`}>
+                          <span> {item.inset == true ? "inset" : ""} {` ${item.right}px ${item.down}px ${item.blur}px ${item.spread}px rgba(${item.color.r}, ${item.color.g}, ${ item.color.b }, ${item.color.a }) `}</span>
                           <div>
-                            <button className='me-3' ><AiFillEdit/></button>
-                            <button onClick={() => handleRemove(index)}><AiFillCloseCircle/></button>
+                            <button className='me-3'>
+                              <AiFillEdit onClick ={() => handleEdit(item.id)}/>  
+                            </button>
+                            <button disabled= {layer.length == 1 ? "true" : "false"}>
+                              <AiFillCloseCircle  onClick={() => handleRemove(index)}/>
+                            </button>
                           </div>
-                        </div>
-                      </>
+                      </li>
                     )
                   })
-                  :""
-                } */}
-              </div>
+                }
+
+              </ul>
             </div>
           </div>
           <div className="preview" >
@@ -182,8 +208,9 @@ function App() {
               </div>
             </div>
             <div className='d-flex justify-content-center p-5' style={{"backgroundColor":`rgba(${backgroundColor.r }, ${backgroundColor.g }, ${ backgroundColor.b }, ${backgroundColor.a })`}} >
-              <div className='box-preview' style={{"boxShadow": `${state.right}px ${state.down}px ${state.blur}px ${state.spread}px rgba(${shadow.r}, ${shadow.g}, ${ shadow.b }, ${shadow.a })  ${inset ? "inset" : ""}`,
-              "backgroundColor":`rgba(${color.r }, ${color.g }, ${ color.b }, ${color.a })`
+              <div className='box-preview' style={{
+                "boxShadow": `${getBoxShadow()}`,
+                "backgroundColor":`rgba(${color.r }, ${color.g }, ${ color.b }, ${color.a })`
             }}>
 
               </div>
@@ -191,17 +218,15 @@ function App() {
           </div>
           <div className="css-code">
             <h6>CSS code</h6>
-            <span>{`box-shadow : ${inset ? "inset" : ""} rgba(${shadow.r}, ${shadow.g}, ${ shadow.b }, ${shadow.a }) ${state.right}px ${state.down}px ${state.blur}px ${state.spread}px`}</span>
-            {/* {
-              layer.length >0 ? layer.map((item,index)=>{
-                return(
-                  <span>
-                    {`,rgba(${item.r}, ${item.g}, ${ item.b }, ${item.a }) ${item.right}px ${item.down}px ${item.blur}px ${item.spread}px`}
-                  </span>
-                )
-              })
-              :""
-            } */}
+              {
+                layer.map((item)=>{
+                  return(
+                    <span key={item.id}>
+                      {item.inset == true ? "inset" : ""} {`rgba(${item.color.r}, ${item.color.g}, ${ item.color.b }, ${item.color.a }) ${item.right}px ${item.down}px ${item.blur}px ${item.spread}px,`}
+                    </span>
+                  )
+                })
+              }
           </div>
           <div className='template'>
             <h6>Template</h6>

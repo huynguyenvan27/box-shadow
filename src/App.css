@@ -1,8 +1,12 @@
 @import 'bootstrap/dist/css/bootstrap.min.css';
 
 .app{
-  height: 150vh;
+  min-height: 150vh;
   background-color: #f9fafb;
+}
+ul,li{
+  list-style: none;
+  padding-left: 0;
 }
 .d-grid{
   display: grid;
