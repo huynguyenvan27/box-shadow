@@ -40,10 +40,10 @@ function App() {
     const v = {}
     v[name] = value
     console.log(v);
-    setLayerCurrent({...layerCurrent, ...v})
-    setLayer(layer.map(item => item.id === layerCurrent.id ? {...item, ...v}: item))
+    {name == "opacity" ?   setLayerCurrent({...layerCurrent,"opacity" :value, color:{...color, a: value/100} }) : setLayerCurrent({...layerCurrent, ...v,color:{...color}})}
+    {name == "opacity" ?  setLayer(layer.map(item => item.id === layerCurrent.id ? {...item, ...v,color:{...color, a: value/100} }: item)) : setLayer(layer.map(item => item.id === layerCurrent.id ? {...item, ...v}: item))}
 }
-
+  console.log(layer);
   const handleOpacity = (value) => {
     setLayerCurrent({...layerCurrent,"opacity" :value, color:{...color, a: value/100} })
     setLayer(layer.map(item => item.id === layerCurrent.id ? {...item, color:{...color, a: value/100}}: item))
@@ -153,7 +153,7 @@ function App() {
             <InputRange
               min = {0}
               max={100} 
-              handleInput={(value) => handleOpacity(value)} 
+              handleInput={(value) => handleInput(value,"opacity")} 
               label={"Opacity"}
               initial = {layerCurrent.opacity}
             />
