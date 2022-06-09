@@ -182,7 +182,7 @@ function App() {
                             <button className='me-3'>
                               <AiFillEdit onClick ={() => handleEdit(item.id)}/>  
                             </button>
-                            <button disabled= {layer.length == 1 ? "true" : "false"}>
+                            <button disabled= {layer.length == 1 ? "true" : ""}>
                               <AiFillCloseCircle  onClick={() => handleRemove(index)}/>
                             </button>
                           </div>
