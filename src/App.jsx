@@ -45,7 +45,7 @@ function App() {
 }
 
   const handleOpacity = (value) => {
-    setLayerCurrent({...layerCurrent, color:{...color,  a: value/100} })
+    setLayerCurrent({...layerCurrent,"opacity" :value, color:{...color, a: value/100} })
     setLayer(layer.map(item => item.id === layerCurrent.id ? {...item, color:{...color, a: value/100}}: item))
   }
 
@@ -115,6 +115,7 @@ function App() {
     layer.map(item=>
       `${item.right}px ${item.down}px ${item.blur}px ${item.spread}px rgba(${item.color.r},${item.color.g},${item.color. b },${item.color.a})${item.inset ? "inset" : ""}`
     )
+
   return (
     <div className="app d-flex align-items-center">
       <div className="container">
