@@ -54,10 +54,7 @@ input[type="range"]{
   cursor: pointer;
   padding : 3px
 }
-.layer-slice{
-  background-color:mediumturquoise;
-  padding: 8px;
-}
+
 button{
   border: none;
   background-color: transparent

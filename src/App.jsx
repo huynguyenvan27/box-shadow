@@ -1,41 +1,48 @@
 import './App.css'
-import { useEffect, useState, useRef } from 'react'
+import {useState,useEffect} from 'react'
 import ColorPicker from './component/ColorPicker'
+import { DragDropContext, Droppable, Draggable } from 'react-beautiful-dnd';
 import  {AiFillCloseCircle,AiFillEdit} from "react-icons/ai"
 import InputRange from './component/InputRange'
 function App() {
 
   const [layerCurrent,setLayerCurrent] = useState({
-    "id":1,
-    "right": 0,
-    "down" : 0,
-    "spread" :3,
-    "blur" : 5,
-    "opacity" :20,
-    "color":{
-      'r':0,
-      'g':0,
-      'b':0,
-      'a':0.2 
+    id:1,
+    right: 0,
+    down : 0,
+    spread :3,
+    blur : 5,
+    opacity :20,
+    color:{
+      r:0,
+      g:0,
+      b:0,
+      a:0.2 
     },
-    "inset" :false
+    inset :false
   })
   const [layer,setLayer] = useState([{
-    "id":1,
-    "right": 0,
-    "down" : 0,
-    "spread" :3,
-    "blur" : 5,
-    "opacity" :20,
-    "color":{
-      'r':0,
-      'g':0,
-      'b':0,
-      'a':0.2 
+    id:1,
+    right: 0,
+    down : 0,
+    spread :3,
+    blur : 5,
+    opacity :20,
+    color:{
+      r:0,
+      g:0,
+      b:0,
+      a:0.2 
     },
-    "inset" : false
+    inset : false
   }])
   
+  useEffect(()=>{
+    if(layer.length == 1){
+      setLayerCurrent(layer[0])
+    }
+  },[layer])
+
   const handleInput = (value, name) => {
     const v = {}
     v[name] = value
@@ -43,26 +50,23 @@ function App() {
     {name == "opacity" ?   setLayerCurrent({...layerCurrent,"opacity" :value, color:{...color, a: value/100} }) : setLayerCurrent({...layerCurrent, ...v,color:{...color}})}
     {name == "opacity" ?  setLayer(layer.map(item => item.id === layerCurrent.id ? {...item, ...v,color:{...color, a: value/100} }: item)) : setLayer(layer.map(item => item.id === layerCurrent.id ? {...item, ...v}: item))}
 }
-  console.log(layer);
-  const handleOpacity = (value) => {
-    setLayerCurrent({...layerCurrent,"opacity" :value, color:{...color, a: value/100} })
-    setLayer(layer.map(item => item.id === layerCurrent.id ? {...item, color:{...color, a: value/100}}: item))
-  }
 
   const handleAddLayer = () => {
-    const lastItem = layer[layer.length - 1]
-    const index = lastItem.id + 1
+    let i = 0;
+    layer.map(item => item.id > i ? i = item.id : i)
+    const index = i + 1
     console.log(index);
     setLayer(
       [...layer,
         {...layerCurrent,
-          "id" :index
+          id :index
         }
       ]
     )
   }
 
-  const handleRemove = (index) => {
+  const handleRemove = (id) => {
+    const index = layer.findIndex(item => item.id == id)
     const layer1 = [...layer]
     layer1.splice(index,1)
     setLayer(layer1)
@@ -70,14 +74,13 @@ function App() {
   const handleEdit = (id) => {
     const item = layer.find(item => item.id == id)
     setLayerCurrent(item)
-    console.log(layerCurrent);
   }
   const handeInset = (e) => {
     setLayerCurrent({
       ...layerCurrent,
-      "inset" : e.target.checked
+      inset : e.target.checked
     })
-    setLayer(layer.map(item => item.id === layerCurrent.id ? {...item, "inset" : e.target.checked}: item))
+    setLayer(layer.map(item => item.id === layerCurrent.id ? {...item, inset : e.target.checked}: item))
   }
 
 
@@ -105,12 +108,21 @@ function App() {
   const handleSetShawdow = (e) => {
     setLayerCurrent({
       ...layerCurrent,
-      "color":{
+      color:{
         ...e.rgb
       }
     })
     setLayer(layer.map(item => item.id === layerCurrent.id ? layerCurrent : item))
   }
+
+  const handleDragEnd = (e) => {
+    if (!e.destination) return;
+    let list = Array.from(layer);
+    let [reorderedItem] = list.splice(e.source.index, 1);
+    list.splice(e.destination.index, 0, reorderedItem);
+    setLayer(list);
+  };
+
   const getBoxShadow = () =>
     layer.map(item=>
       `${item.right}px ${item.down}px ${item.blur}px ${item.spread}px rgba(${item.color.r},${item.color.g},${item.color. b },${item.color.a})${item.inset ? "inset" : ""}`
@@ -170,28 +182,55 @@ function App() {
             </div>
             <div className='mt-3'>
               <button className='btn btn-light mb-3' onClick={handleAddLayer}>Add Layer</button>
-              <ul> 
+              <DragDropContext onDragEnd={handleDragEnd}>
+              <Droppable droppableId="droppable-1">
+              {(provider) => (
+              <ul {...provider.droppableProps}  ref={provider.innerRef}> 
                 {
-                  layer.map((item,index) => {
-                    return(
-                      <li 
-                        key={item.id} 
-                        className={`${item.id==layerCurrent.id ? 'layer-slice' : 'layer'} d-flex justify-content-between`}>
+                  layer.map((item,index) => (
+                      <Draggable
+                      key={item.id}
+                      draggableId={item.id.toString()}
+                      index={index}
+                    >
+                      {(provider,snapshot) => {
+                         const style = {
+                          backgroundColor: snapshot.isDragging ? 'blue' : 'white',
+                          ...provider.draggableProps.style,
+                        }
+                        const styleCurrent = {
+                          backgroundColor: 'mediumturquoise',
+                          ...provider.draggableProps.style,
+                        }
+                        return (
+                        <li 
+                        {...provider.draggableProps} 
+                        ref={provider.innerRef} 
+                        style={item.id==layerCurrent.id ? styleCurrent :style }
+                        {...provider.dragHandleProps}
+                        className="layer d-flex justify-content-between">
                           <span> {item.inset == true ? "inset" : ""} {` ${item.right}px ${item.down}px ${item.blur}px ${item.spread}px rgba(${item.color.r}, ${item.color.g}, ${ item.color.b }, ${item.color.a }) `}</span>
                           <div>
                             <button className='me-3'>
                               <AiFillEdit onClick ={() => handleEdit(item.id)}/>  
                             </button>
-                            <button disabled= {layer.length == 1 ? "true" : ""}>
-                              <AiFillCloseCircle  onClick={() => handleRemove(index)}/>
+                            <button disabled= {layer.length == 1 ? "true" : ""} onClick={() => handleRemove(item.id)}>
+                              <AiFillCloseCircle />
                             </button>
                           </div>
-                      </li>
+                      </li>)
+                      }
+                      }
+                    </Draggable>
+                    
                     )
-                  })
+                  )
                 }
-
+                 {provider.placeholder}
               </ul>
+              )}
+              </Droppable>
+              </DragDropContext>
             </div>
           </div>
           <div className="preview" >
