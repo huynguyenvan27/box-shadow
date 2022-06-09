@@ -115,8 +115,6 @@ function App() {
     layer.map(item=>
       `${item.right}px ${item.down}px ${item.blur}px ${item.spread}px rgba(${item.color.r},${item.color.g},${item.color. b },${item.color.a})${item.inset ? "inset" : ""}`
     )
-  
-  console.log(getBoxShadow());
   return (
     <div className="app d-flex align-items-center">
       <div className="container">
@@ -175,7 +173,9 @@ function App() {
                 {
                   layer.map((item,index) => {
                     return(
-                      <li key={item.id} className={`${item.id==layerCurrent.id ? 'layer-slice' : 'layer'} d-flex justify-content-between`}>
+                      <li 
+                        key={item.id} 
+                        className={`${item.id==layerCurrent.id ? 'layer-slice' : 'layer'} d-flex justify-content-between`}>
                           <span> {item.inset == true ? "inset" : ""} {` ${item.right}px ${item.down}px ${item.blur}px ${item.spread}px rgba(${item.color.r}, ${item.color.g}, ${ item.color.b }, ${item.color.a }) `}</span>
                           <div>
                             <button className='me-3'>

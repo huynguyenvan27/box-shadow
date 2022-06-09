@@ -2,6 +2,7 @@ import React, { useEffect,useState } from 'react'
 
 export default function InputRange({label,min,max,handleInput,initial}) {
   const [inputValue,setInputValue] = useState(0)
+
   useEffect(() => {
     setInputValue(initial)
   },[initial])
@@ -15,7 +16,7 @@ export default function InputRange({label,min,max,handleInput,initial}) {
           <label className='d-block' htmlFor={label}>{label}</label>
           <input type="range" 
           min={min} max={max} 
-          defaultValue={initial} 
+          value={initial} 
           onInput={handleChange} 
           id={label} />
         </div>
