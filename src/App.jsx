@@ -1,11 +1,11 @@
 import './App.css'
-import {useState,useEffect} from 'react'
+import {useState,useEffect, useRef} from 'react'
 import ColorPicker from './component/ColorPicker'
 import { DragDropContext, Droppable, Draggable } from 'react-beautiful-dnd';
 import  {AiFillCloseCircle,AiFillEdit} from "react-icons/ai"
 import InputRange from './component/InputRange'
 function App() {
-
+  const checkBox = useRef()
   const [layerCurrent,setLayerCurrent] = useState({
     id:1,
     right: 0,
@@ -75,6 +75,11 @@ function App() {
     const item = layer.find(item => item.id == id)
     setLayerCurrent(item)
   }
+
+  useEffect(() => {
+    checkBox.current.checked = layerCurrent.inset
+  },[layerCurrent])
+
   const handeInset = (e) => {
     setLayerCurrent({
       ...layerCurrent,
@@ -127,7 +132,7 @@ function App() {
     layer.map(item=>
       `${item.right}px ${item.down}px ${item.blur}px ${item.spread}px rgba(${item.color.r},${item.color.g},${item.color. b },${item.color.a})${item.inset ? "inset" : ""}`
     )
-
+  
   return (
     <div className="app d-flex align-items-center">
       <div className="container">
@@ -171,7 +176,7 @@ function App() {
             />
 
             <div className="mt-3">
-              <input type="checkBox" id='inset' onChange={(e) => handeInset(e)}/>
+              <input type="checkBox" id='inset' ref={checkBox} onChange={(e) => handeInset(e)}/>
               <label htmlFor="inset">Inset</label>
             </div>
             <div className="mt-3">
